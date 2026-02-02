@@ -20,7 +20,7 @@ Ce bref projet est consacré à la conception et mise en production d'une infras
 * L'environnement .yml vous permettant d'exécuter le .ipynb correctement.
 
 > [!NOTE]
-> Ce projet s'attend à ce que vous soyez familier avec des outils tels Docker ou Airflow et leur installation/utilisation! Notez également que sans instruction sur la gestion d'exception, lorsque l'API est surchargée et retourne une erreur html 500, le process en cours s'interrompra et il faudra attendre la prochaine itération orchestrée.
+> Ce projet s'attend à ce que vous soyez familier avec des outils tels Docker ou Airflow et leur installation/utilisation!
 
 > [!WARNING]
 > Ce projet implique l'usage d'un outil en ligne sur le modèle économique du *freemium*, par conséquent il vous faudra créer votre propre compte sur le service impliqué et en gérer votre propre utilisation. Suivez attentivement les instructions du guide sur les variables confidentielles!
@@ -49,7 +49,7 @@ This short project is dedicated to producing & deploying pipelines to automate f
 * The .yml environment to properly run the .ipynb notebook.
 
 > [!NOTE]
-> This project expects you to be familiar with tools like Docker or Airflow and their installation/use! Please also note without instructions regarding exception management, should the API reach its limit and return a 500 html error, the current process will be interrupted and you will have to wait for the next orchestrated iteration.
+> This project expects you to be familiar with tools like Docker or Airflow and their installation/use!
 
 > [!WARNING]
 > This project involves an online tool on a *freemium* economical model, hence the need for the user to create their own account on the related service and monitor their own use of it. Make sure to follow the instructions given in the environment template file!

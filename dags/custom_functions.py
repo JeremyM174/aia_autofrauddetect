@@ -20,11 +20,15 @@ def process_api_data(**context):
     df_temp = pd.DataFrame()
     for file in os.listdir('./data/json'):
         if file.endswith('.json'):
-            with open(f'./data/json/{file}', "r", encoding='utf-8') as source_json:
-                source_file = source_json.read()
-                usable_source = StringIO(json.loads(source_file))
-                json_temp = pd.read_json(usable_source, orient='split')
-                df_temp = pd.concat([df_temp, json_temp])
+            try:
+                with open(f'./data/json/{file}', "r", encoding='utf-8') as source_json:
+                    source_file = source_json.read()
+                    usable_source = StringIO(json.loads(source_file))
+                    json_temp = pd.read_json(usable_source, orient='split')
+                    df_temp = pd.concat([df_temp, json_temp])
+            except Exception as exc:
+                print('Unexpected content found in API reply. Printing error message:')
+                print(exc)
         else:
             print(f'Error: {file} is not a json!')
     print(df_temp.head())

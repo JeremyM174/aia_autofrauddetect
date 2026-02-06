@@ -68,3 +68,25 @@ with DAG(dag_id="fraud_detection", default_args=default_args, schedule_interval=
     end_dag = DummyOperator(task_id="end_dag")
 
     start_dag >> api_ETL >> api_predict >> end_dag
+
+
+
+with DAG(dag_id="daily_report", default_args=default_args, schedule_interval="@daily", catchup=False) as dag2:
+    start_dag = DummyOperator(task_id="start_dag")
+
+    with TaskGroup(group_id="report") as generate_report:
+        produce_report = PythonOperator(
+            task_id="produce_report",
+            python_callable=custom_functions.produce_report
+        )
+
+        send_report = PythonOperator(
+            task_id="send_report",
+            python_callable=custom_functions.send_report
+        )
+
+        [produce_report >> send_report]
+
+    end_dag = DummyOperator(task_id="end_dag")
+
+    start_dag >> generate_report >> end_dag

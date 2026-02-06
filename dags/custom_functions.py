@@ -1,11 +1,13 @@
 import pandas as pd
 import os, json, joblib
-from datetime import datetime, date
+from datetime import datetime, date, time, timedelta
 from io import StringIO
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
 
 neontable=os.getenv('SQL') #Do not forget the .env file; you MUST set its variables for the system to work!
 #For obvious reasons, I didn't provide my own credentials; NEVER share yours, refer to the `.env_example.md` file!
@@ -153,3 +155,71 @@ Have a good day!"""
                 server.quit()
         else:
             print(f'Transaction {transaction_id} was evaluated as safe.')
+
+
+
+# ========== DAILY REPORT ==========
+
+
+
+def produce_report():
+    yesterday = date.today() - timedelta(days=1)
+    start_dt = datetime.combine(yesterday, time.min)
+    end_dt = datetime.combine(yesterday, time.max)
+    report_statement = text('SELECT * FROM logs WHERE "current_time" >= :start_dt AND "current_time" <= :end_dt')
+
+    engine = create_engine(neontable, echo=False)
+    report_connect = engine.connect()
+    df_report = pd.read_sql_query(sql=report_statement, con=report_connect, params={"start_dt":start_dt, "end_dt":end_dt})
+    df_report.to_csv("tmp/daily_report.csv", index=False)
+    # File kept in storage as-is; will always write over contents, if no transactions yesterday -> csv only has columns
+
+
+def send_report():
+    csv_path = "tmp/daily_report.csv"
+    df_daily = pd.read_csv(csv_path)
+    print(f"{df_daily.head()}\n\nPreparing to send report...")
+    sender_email = os.getenv('smtp_sender')
+    app_password = os.getenv('smtpass')
+    receiver_email = os.getenv('smtp_receiver')
+    msg = MIMEMultipart()
+    msg['From'] = sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = "Detection system: daily report"
+
+    body = f"""Good morning teams, it's time for the daily report!
+
+Please find the attached .csv file to analyze yesterday's transactions.
+
+From your favorite automated system, have a good day!
+"""
+    msg.attach(MIMEText(body))
+
+    #attaching file
+    try:
+        with open(csv_path, 'rb') as attachment:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment.read())
+        encoders.encode_base64(part)
+        
+        filename = os.path.basename(csv_path)
+        part.add_header('Content-Disposition', f'attachment; filename= {filename}')
+        msg.attach(part)
+        print("File attached!")
+        
+    except Exception as e:
+        print(f"!!! FAILED ATTACHMENT !!! Error message: \n{e}")
+    
+    #sending mail
+    try:
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(sender_email, app_password)
+        server.send_message(msg)
+        print(f"Daily report sent!")
+        
+    except Exception as e:
+        print(f"!!! ERROR SENDING MAIL !!! Error message: \n{e}")
+
+    finally:
+        server.quit()

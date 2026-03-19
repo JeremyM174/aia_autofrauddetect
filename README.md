@@ -12,10 +12,10 @@ Bienvenue dans mon repo dédié au projet de détection automatique de fraude, p
 Ce bref projet est consacré à la conception et mise en production d'une infrastructure automatisée incluant des pipelines pour la détection par IA de fraudes bancaires. Vous trouverez ici:
 
 * Le notebook .ipynb incluant le travail sur le machine learning,
-* Les dossiers `dags`, `data`, `logs` & `plugins` nécessaires au fonctionnement d'Airflow,
-* Le dossier `understanding_infrastructure` expliquant la réflexion derrière ce système,
-* Les fichiers `Dockerfile`, `docker-compose.yaml` & `requirements.txt` pour déployer Airflow avec Docker,
+* Le dossier `docs` expliquant la réflexion derrière ce système et comment le faire fonctionner,
 * Un guide d'instructions `.env_example.md` pour la création des variables confidentielles d'environnement,
+* Les dossiers `dags`, `data`, `logs` & `plugins` nécessaires au fonctionnement d'Airflow,
+* Les fichiers `Dockerfile`, `docker-compose.yaml` & `requirements.txt` pour déployer Airflow avec Docker,
 * Un exemple de réponse d'API `test_api.json` explicitant la donnée reçue alimentant ce système,
 * L'environnement .yml vous permettant d'exécuter le .ipynb correctement.
 
@@ -41,10 +41,10 @@ Welcome to my repository dedicated to the automatic fraud detection project, for
 This short project is dedicated to producing & deploying pipelines to automate fraud detection with AI on transactions. You may find here:
 
 * The .ipynb notebook for the machine learning part,
-* The `dags`, `data`, `logs` & `plugins` folders required to properly run Airflow,
-* The `understanding_infrastructure` folder detailing the thinking behind this system,
-* The `Dockerfile`, `docker-compose.yaml` & `requirements.txt` files to deploy Airflow with Docker,
+* The `docs` folder detailing the thinking behind this system and how to run it,
 * An instructions file `.env_example.md` to create your confidential environment variables,
+* The `dags`, `data`, `logs` & `plugins` folders required to properly run Airflow,
+* The `Dockerfile`, `docker-compose.yaml` & `requirements.txt` files to deploy Airflow with Docker,
 * An example of API reply `test_api.json` showing the data format feeding this system,
 * The .yml environment to properly run the .ipynb notebook.
 

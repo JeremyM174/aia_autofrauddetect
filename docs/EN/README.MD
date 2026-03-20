@@ -1,10 +1,12 @@
-:uk: *Table of contents*
+# :uk: *Table of contents*
+
 Please note this documentation expects the reader to at least be aware of what Docker is.
 
 1. ![The reasoning](#understanding-the-system)
   1.1 ![Line of thought](#line-of-thought)
   1.2 ![The ETL process](#the-etl-process)
   1.3 ![Data consumption & prediction](#data-consumption--prediction)
+
 2. ![How to run it](#how-to-run-the-system)
   2.1 ![Requirements](#requirements)
   2.2 ![Starting Airflow](#starting-airflow)
@@ -32,6 +34,8 @@ This is where the thinking behind the system starts. As this is a student projec
 
 Now, their performances are far from being great - but again, it's not the priority. Thus comes the interesting part: we did *not* alter our training data, so we will instead want to adapt what we receive from the API!
 
+---
+
 ### The ETL process
 
 From there follows the logic of the entire system: it's all about how to transform what our source provides us with, in order to feed information our model recognizes. Hence the demonstration from the schema: the **ETL** process first. We recover our API data through bash commands, but what we receive is not the exact json format we want to extract; it is nested as a string from the html format. So we begin transforming it **only** to make it usable as ordinary tabular, SQL data before loading it into our PostgreSQL on ![Neon](https://neon.com/)!
@@ -39,6 +43,8 @@ From there follows the logic of the entire system: it's all about how to transfo
 That's where we start anticipating the next half of our work involving the prediction. Why loading it *twice* on Neon? We use two different tables with different objectives: one is meant to have its data *appended* - those are our logs. Whichever the needs are, these logs serve as a backbone storing all the original data we recovered; although its format changed, the contents are the same as the **raw** data we were provided with! While it will only keep on accumulating rows, it becomes our reference. A better method for a real-world setting would've consisted in performing larger upload batches at a slower frequency instead of every time we pull data from the API, but without further instructions over this case, the idea was put aside.
 
 Back to the topic, the second table is meant to serve operational means for our system: it only has its data *replaced*, referred to as the "work in progress". This is meant to improve operational speed; it will only serve as a source for the consumption of this data, meaning it doesn't need long-time storage which should be handled by another resource - only faster processing!
+
+---
 
 ### Data consumption & prediction
 
@@ -49,6 +55,9 @@ Here, the objective is to make sure the contents will be understandable for our 
 Once our data is transformed and ready for ingestion, we also recover the preprocessor used in the model to apply it on our data. This puts the finishing touches on making our *input* match what our model learned from.
 
 Then finally comes the **predict** - whether the model will label the given transactions as fraudulent or not! Should it estimate it as legitimate, this is where this work ends; on the opposite though, it cannot be ignored! Still, we do not want to just leave it as-is; our instructions expect us *only* to send a notification, nothing more. Hence the last part: whenever the model assigns a fraudulent label, the system sends a message to the designated email address!
+
+
+---
 
 
 
@@ -64,6 +73,8 @@ Then finally comes the **predict** - whether the model will label the given tran
 * Find the folder where you've downloaded the project; open a terminal window inside the `aia_autofrauddetect` folder.
 * *-Optional-* If you wish to run the notebook or produce a new model, create a fitting environment with the .yaml backup - else, skip this step.
 
+---
+
 ### Starting Airflow
 
 In the terminal window you opened under `\aia_autofrauddetect`, wake up our orchestrator with the following commands:
@@ -73,6 +84,8 @@ In the terminal window you opened under `\aia_autofrauddetect`, wake up our orch
 Both steps may take some time; the second will lock your terminal. Once the flurry of messages slows down, wait for a health message from the scheduler to come in to know when Airflow is ready, similar to this one:
 `airflow-scheduler-1  | 127.0.0.1 - - [19/Mar/2026 19:06:32] "GET /health HTTP/1.1" 200 -`
 
+---
+
 ### Accessing Airflow
 
 It will be made available on your local host. Currently, the webserver (the interface you'll interact with) is set on the port 8085.
@@ -80,6 +93,8 @@ It will be made available on your local host. Currently, the webserver (the inte
 If you're familiar with how to edit Docker files and this port is unavailable, you can change it in the `docker-compose.yaml` file under the "airflow-webserver" service.
 
 Otherwise, open your favorite browser and type the following address to access Airflow: `http://localhost:8085/`
+
+---
 
 ### Running the system
 
@@ -89,11 +104,15 @@ Simply make use on the left hand side of the toggles to turn them on or off. Rem
 
 Should one of the pulled transactions be considered as a fraud by the model, the script will send you an e-mail alert about it to the `smtp_receiver` address you entered in your `.env` file.
 
+---
+
 ### Checking the results
 
 Since producing a convenient dashboard wasn't the topic, you should either check NeonDB's user interface and find the `logs` SQL table, either do it the hard way by reading Airflow's live logs.
 
 If you have the know-how, you could also alter the code a little to make the `daily_report` produce today's data on each trigger!
+
+---
 
 ### Shutting down/deleting the project
 
@@ -104,9 +123,11 @@ There are two ways to shut down the project:
 Docker is hungry with disk space, so to delete the project and free up some storage, again make your way with a terminal window into the `aia_autofrauddetect` but this time type `docker images`. It should give you such a result:
 ![docker_i](../img/docker_images.png)
 
-The IDs will be unique to your instance and will differ from those displayed here. Identify their IDs, then type the following command: `docker rmi {ID}` whre you will replace {ID} with those belonging to your instance - you will then have to pass this command three times (since three images are tied to the project).
+The IDs will be unique to your instance and will differ from those displayed here. Identify their IDs, then type the following command: `docker rmi {ID}` where you will replace {ID} with those belonging to your instance - you will then have to pass this command three times (since three images are tied to the project).
 
 This won't really remove *all* associated data, please refer to Docker's documentation for more advanced commands. A good data purge *will* definitely free up all space but I'd rather avoid breaking your entire setup if you have other containers running, mmh?
+
+---
 
 ### Limitations
 
